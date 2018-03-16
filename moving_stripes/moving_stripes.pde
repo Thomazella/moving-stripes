@@ -9,9 +9,13 @@ float random_red = random;
 float random_green = random;
 float random_blue = random;
 float random_gray = random;
+boolean loop = true;
+boolean debug = true;
+boolean manualLooping = false;
 
 void updateColors() {
   float red_alwaysPositive;
+  
   red = map( mouseX,width, 0,0,1) + random_red;
 
   gray = map(mouseY,height,0,0,1) + random_gray;
@@ -27,7 +31,7 @@ void updateColors() {
 }
 
 void updateSpeed() {
-  int speed_min = 10;
+  int speed_min = 5;
   int speed_max = 145;
   float X = abs(map(mouseX,width ,0,1,-1));
   float Y = abs(map(mouseY,height,0,1,-1));
@@ -66,36 +70,16 @@ void randomizeGray() {
   random_gray = getRandom();
 }
 
-void updateKeyboard() {
-  if (keyPressed) {
-    if (key == 'r' || key == 'R') {
-      randomizeRed();
-    }
-    if (key == 'g' || key == 'G') {
-      randomizeGreen();
-    }
-    if (key == 'b' || key == 'B') {
-      randomizeBlue();
-    }
-    if (key == 'w' || key == 'W') {
-      randomizeGray();
-    }
-  }
-  if (mousePressed) {
-    if (mouseButton == LEFT) {
-      randomizeAll();
-    }
-  }
-}
-
 void updateAll(){
   updateColors();
   debug();
   updateSpeed();
-  updateKeyboard();
 }
 
 void debug() {
+  if (!debug) {
+   return;
+  }
   println(" - - - ");
   println("red "+red);
   println("green "+green);
@@ -111,17 +95,93 @@ void setup() {
   noStroke();
   updateAll();
 }
+/*
+drawOnceAndStop() {
+  manualLooping = true;
+  i = 0;
+  loop();
+  //?
+}
+
+drawUntilFinishedAndStop() {
+  manualLooping = true;
+  loop();
+}
+*/
+manualDraw(){
+  if ( i >= width) {
+    drawOnceAndStop();
+  } else {
+   drawUntilFinishedAndStop(); 
+  }
+}
+
+void drawFrame() {
+  fill(red*255, green*255, blue*255);
+  rect(0, i, width, 10);
+  delay(speed);
+  fill(gray*255);
+  rect(i, 0, 10, height);
+  delay(speed);
+  updateAll();
+}
+
+drawStop() {
+  
+}
+
+void keyPressed() {
+  if (keyPressed) {
+    if (key == 'r' || key == 'R') {
+      randomizeRed();
+    }
+    if (key == 'g' || key == 'G') {
+      randomizeGreen();
+    }
+    if (key == 'b' || key == 'B') {
+      randomizeBlue();
+    }
+    if (key == 'w' || key == 'W') {
+      randomizeGray();
+    }
+    if (key == 'c' || key == 'C') {
+      background(red*255);
+    }
+     if (keyCode == 32) {
+       if (loop) {
+        loop = false;
+        noLoop();
+       } else {
+        loop();
+        loop = true;
+       }
+    }
+    if (keyCode == 10) {
+       if (loop) {
+        return;
+       } else {
+        manualLooping = true
+        manualDraw();
+       }
+    }
+    //println(keyCode);
+  }
+}
+
+void mousePressed() {
+  if (mouseButton == LEFT) {
+    randomizeAll();
+  }
+}
 
 void draw() {
   if  (i < width) {
-    fill(red*255, green*255, blue*255);
-    rect(0, i, width, 10);
-    delay(speed);
-    fill(gray*255);
-    rect(i, 0, 10, height);
-    delay(speed);
-    updateAll();
-    i += 20;
+    drawFrame();
+    if (manualLooping) {
+      manualDraw(); 
+    } else {
+      i += 20;
+    }
   } else {
     i = 0;
   }
