@@ -10,8 +10,7 @@ float random_green = random;
 float random_blue = random;
 float random_gray = random;
 boolean loop = true;
-boolean debug = true;
-boolean manualLooping = false;
+boolean tut = true;
 
 void updateColors() {
   float red_alwaysPositive;
@@ -27,7 +26,7 @@ void updateColors() {
   } else {
     red_alwaysPositive = red;
   }
-  green = pow(red_alwaysPositive * 1.4,0.3) - 0.32  + random_green;
+  green = pow(red_alwaysPositive * 1.4,0.3)  + random_green;
 }
 
 void updateSpeed() {
@@ -70,6 +69,56 @@ void randomizeGray() {
   random_gray = getRandom();
 }
 
+void keyPressed() {
+  if (tut) {
+   tut = false;
+   background(27);
+   return;
+  }
+  if (key == 'r' || key == 'R') {
+    randomizeRed();
+    return;
+  }
+  if (key == 'g' || key == 'G') {
+    randomizeGreen();
+    return;
+  }
+  if (key == 'b' || key == 'B') {
+    randomizeBlue();
+    return;
+  }
+  if (key == 'w' || key == 'W') {
+    randomizeGray();
+    return;
+  }
+  if (key == 'c' || key == 'C') {
+    background(gray*255);
+    return;
+  }
+   if (keyCode == 32) {
+     if (loop) {
+      loop = false;
+      noLoop();
+      return;
+     } else {
+      loop();
+      loop = true;
+      return;
+     }
+  }
+}
+
+void mousePressed() {
+  if (tut) {
+   tut = false;
+   background(27);
+   return;
+  }
+  if (mouseButton == LEFT) {
+    randomizeAll();
+  }
+}
+
 void updateAll(){
   updateColors();
   debug();
@@ -77,16 +126,29 @@ void updateAll(){
 }
 
 void debug() {
-  if (!debug) {
-   return;
-  }
   println(" - - - ");
   println("red "+red);
   println("green "+green);
   println("blue "+blue);
   println("gray "+gray);
-  println("random "+random);
   println("speed "+speed);
+}
+
+void tutorial() {
+ int lineHeight = 38;
+ background(255);
+ fill(50, 152, 223);
+ textSize(lineHeight - 10);
+ text("r", 200,200 + lineHeight * 0); text("randomize red", 270,200 + lineHeight * 0);
+ text("g", 200,200 + lineHeight * 1); text("randomize green", 270,200 + lineHeight * 1);
+ text("b", 200,200 + lineHeight * 2); text("randomize blue", 270,200 + lineHeight * 2);
+ text("w", 200,200 + lineHeight * 3); text("randomize gray", 270,200 + lineHeight * 3);
+ text("c", 200,200 + lineHeight * 4); text("clear drawing", 270,200 + lineHeight * 4);
+ text("space", 140,200 + lineHeight * 5); text("pause drawing", 270,200 + lineHeight * 5);
+ text("mouse left", 70,200 + lineHeight * 6); text("randomize all", 270,200 + lineHeight * 6);
+ fill(0, 50, 75);
+ text(">move the mouse to change color/speed", 70,200 + lineHeight * 8);
+ text(">press any key to start<", 140,200 + lineHeight * 10);
 }
 
 void setup() {
@@ -95,94 +157,22 @@ void setup() {
   noStroke();
   updateAll();
 }
-/*
-drawOnceAndStop() {
-  manualLooping = true;
-  i = 0;
-  loop();
-  //?
-}
-
-drawUntilFinishedAndStop() {
-  manualLooping = true;
-  loop();
-}
-*/
-manualDraw(){
-  if ( i >= width) {
-    drawOnceAndStop();
-  } else {
-   drawUntilFinishedAndStop(); 
-  }
-}
-
-void drawFrame() {
-  fill(red*255, green*255, blue*255);
-  rect(0, i, width, 10);
-  delay(speed);
-  fill(gray*255);
-  rect(i, 0, 10, height);
-  delay(speed);
-  updateAll();
-}
-
-drawStop() {
-  
-}
-
-void keyPressed() {
-  if (keyPressed) {
-    if (key == 'r' || key == 'R') {
-      randomizeRed();
-    }
-    if (key == 'g' || key == 'G') {
-      randomizeGreen();
-    }
-    if (key == 'b' || key == 'B') {
-      randomizeBlue();
-    }
-    if (key == 'w' || key == 'W') {
-      randomizeGray();
-    }
-    if (key == 'c' || key == 'C') {
-      background(red*255);
-    }
-     if (keyCode == 32) {
-       if (loop) {
-        loop = false;
-        noLoop();
-       } else {
-        loop();
-        loop = true;
-       }
-    }
-    if (keyCode == 10) {
-       if (loop) {
-        return;
-       } else {
-        manualLooping = true
-        manualDraw();
-       }
-    }
-    //println(keyCode);
-  }
-}
-
-void mousePressed() {
-  if (mouseButton == LEFT) {
-    randomizeAll();
-  }
-}
 
 void draw() {
-  if  (i < width) {
-    drawFrame();
-    if (manualLooping) {
-      manualDraw(); 
-    } else {
-      i += 20;
-    }
+  if (tut) {
+   tutorial();
   } else {
-    i = 0;
+    if  (i < width) {
+      fill(red*255, green*255, blue*255);
+      rect(0, i, width, 10);
+      delay(speed);
+      fill(gray*255);
+      rect(i, 0, 10, height);
+      delay(speed);
+      updateAll();
+      i += 20;
+    } else {
+      i = 0;
+    }
   }
 }
